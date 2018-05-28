@@ -21,7 +21,6 @@ import org.gotti.wurmunlimited.modsupport.actions.ModActions;
 
 import java.util.Collections;
 import java.util.List;
-//import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -48,7 +47,7 @@ public class JoustAction implements ModAction {
     private boolean AllowSkillGain;
     private float LanceRange;
 
-    private float OldDistance;
+    //private float OldDistance;
     private float Speed;
 
     public JoustAction(int id, int damage, int basehitchance, int spearskillrange, int bonuslancedamage, boolean debug, int losehemletchance, float perkmdamageboost, boolean allowskillgain, float lancerange){
@@ -156,7 +155,7 @@ public class JoustAction implements ModAction {
                 float hitroll = Server.rand.nextFloat() * 100;
                 double HitChance = 0;
                 try {
-                    HitChance = BaseHitChance + (SpearSkillRange * (player.getSkills().getSkillOrLearn(10088).getKnowledge() / 100));
+                    HitChance = BaseHitChance + (SpearSkillRange * (player.getSkills().getSkillOrLearn(10088).getRealKnowledge() / 100));
 
                     if( AllowSkillGain) {
                         Skill lanceskill = player.getSkills().getSkillOrLearn( player.getRighthandItem().getPrimarySkill());
@@ -177,10 +176,11 @@ public class JoustAction implements ModAction {
 
                 ret = (player.getRighthandItem().getCurrentQualityLevel() / 100) * (LanceDamage + ( Server.rand.nextInt( BonusLanceDamage + 1)));
                 debugstr = debugstr.concat("with a " + player.getRighthandItem().getTemplate().getName() + " ");
-                //float speed = 0.0f;
-                //Creature mount = FindMount( player);
-                //Vehicle vehicle = mount.getMountVehicle();
-                //speed = mount.getMountSpeedPercent(false) * vehicle.calculateNewMountSpeed( mount, false);
+
+                Speed = player.getMovementScheme().getMountSpeed();
+                debugstr = debugstr.concat(" at the speed of: " + Speed + " ");
+
+                // I can't for the life of me figure out how to get a Players speed..... I'm just missing something obvious I think.
 
                 double tmp = ret * (Speed * PerKMDamageBoost);
                 ret = tmp + ret;
@@ -333,6 +333,7 @@ public class JoustAction implements ModAction {
 
                 if( Debug) {
                     attacker.getCommunicator().sendToGlobalKingdomChat(debugstr);
+                    logger.log(Level.INFO, debugstr);
                 }
 
                 return wound;
@@ -344,10 +345,6 @@ public class JoustAction implements ModAction {
                     if (counter == 1.0f) {
                         Server.getInstance().broadCastMessage( "Let the joust begin, CHARGE!", target.getTileX(), target.getTileY(), true, broadcastrange);
 
-                        Vector2f CurPosition = performer.getPos2f();
-                        Vector2f TargetPosition = target.getPos2f();
-                        OldDistance = Point2D.distance( CurPosition.x, CurPosition.y, TargetPosition.x, TargetPosition.y);
-
                         int time = 150;
 
                         performer.getCurrentAction().setTimeLeft(time);
@@ -357,7 +354,6 @@ public class JoustAction implements ModAction {
                         return false;
 
                     }else{
-                        //performer.getCommunicator().sendNormalServerMessage("Your speed is: " + RateSpeed( performer, target));
 
                         if (performer.getPos2f().distance(target.getPos2f()) < LanceRange) {
 
@@ -393,15 +389,5 @@ public class JoustAction implements ModAction {
                 return false;
             }
         };
-    }
-
-    public float RateSpeed( Creature performer, Creature target){
-        Vector2f CurPosition = performer.getPos2f();
-        Vector2f TargetPosition = target.getPos2f();
-        float PosDiff = Point2D.distance( CurPosition.x, CurPosition.y, TargetPosition.x, TargetPosition.y);
-        float speed = OldDistance - PosDiff;
-        OldDistance = PosDiff;
-
-        return speed;
     }
 }

@@ -1,7 +1,6 @@
 package org.griz.wurmunlimited.mods;
 
 import com.wurmonline.server.MiscConstants;
-import com.wurmonline.server.bodys.BodyHuman;
 import com.wurmonline.server.items.*;
 import com.wurmonline.server.skills.SkillList;
 
@@ -10,6 +9,8 @@ import org.gotti.wurmunlimited.modsupport.ItemTemplateBuilder;
 import org.gotti.wurmunlimited.modsupport.actions.ModActions;
 
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created by Griz on 10/22/2016.
@@ -17,17 +18,19 @@ import java.util.Properties;
 
 public class TheJoust implements WurmServerMod, ItemTemplatesCreatedListener, ServerStartedListener, ItemTypes, MiscConstants, Configurable{
 
-    public int LanceID;
-    public int LanceDamage;
-    public int BaseHitChance;
-    public int SpearSkillRange;
-    public int BonusLanceDamage;
-    public boolean Debug;
-    public int LoseHelmetChance;
-    public float PerKMDamageBoost;
-    public boolean AllowSkillGain;
-    public boolean AllowCraftingLance;
-    public float LanceRange;
+    private int LanceID;
+    private int LanceDamage;
+    private int BaseHitChance;
+    private int SpearSkillRange;
+    private int BonusLanceDamage;
+    private boolean Debug;
+    private int LoseHelmetChance;
+    private float PerKMDamageBoost;
+    private boolean AllowSkillGain;
+    private boolean AllowCraftingLance;
+    private float LanceRange;
+
+    private static Logger logger = Logger.getLogger(TheJoust.class.getName());
 
     @Override
     public void configure(Properties properties){
@@ -80,11 +83,16 @@ public class TheJoust implements WurmServerMod, ItemTemplatesCreatedListener, Se
     @Override
     public void onServerStarted() {
 
+        logger.log(Level.INFO, "Registering jousting action");
+
         ModActions.registerAction( new JoustAction( LanceID, LanceDamage, BaseHitChance, SpearSkillRange, BonusLanceDamage, Debug, LoseHelmetChance, PerKMDamageBoost, AllowSkillGain, LanceRange));
 
         if (LanceID > 0 && AllowCraftingLance) {
             final AdvancedCreationEntry creationEntry = CreationEntryCreator.createAdvancedEntry(SkillList.CARPENTRY, ItemList.knifeCarving, ItemList.log, LanceID, false, true, 50.0f, false, false, CreationCategories.WEAPONS);
             creationEntry.addRequirement(new CreationRequirement(1, ItemList.sheetIron, 1, true));
         }
+
+        logger.log(Level.INFO, "Finished registering jousting action");
+
     }
 }
