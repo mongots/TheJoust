@@ -7,6 +7,7 @@
     -Skill gains for both Long Spear and Shields, can be toggled on and off<br>
     -Jousters can take some fairly brutal injuries, Armour type and QL as well as shields will all work to reduce any damage taken.<br>
     -Jousters can also have other effects take place such as being dismounted or having a helmet ripped off!<br>
+    -Many configuration options to control damage taken during Jousting.
     
     
 From the config file....
